@@ -1,0 +1,50 @@
+/* index.jsp(web)*/
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<body>
+<form method="post" action="voting">
+    <table style="border:2px solid black; background:lightgreen;">
+        <tr>
+            <td>Name: <input type="text" name="name" placeholder="Enter name" required /></td>
+        </tr>
+        <tr>
+            <td>Age: <input type="number" name="age" placeholder="Enter age" required /></td>
+        </tr>
+        <tr>
+            <td><input type="submit" value="Check Voting Eligibility" /></td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>
+
+/* voting.java*/
+package age;
+import java.io.*;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+
+@WebServlet("/voting")
+public class voting extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        String name = request.getParameter("name");
+        int age = Integer.parseInt(request.getParameter("age"));
+        
+        out.println("<html><body>");
+        if (age >= 18) {
+          out.println("<h2 style='color:green;'>" + name + ", you are eligible to vote.</h2>");
+        } else {
+             out.println("<h2 style='color:red;'>" + name + ", you are not eligible to vote.</h2>");
+        }
+        out.println("<br><a href=\"index.jsp\">Home</a>");
+        out.println("</body></html>");
+    }
+}
+ 
+
+
+
