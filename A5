@@ -19,7 +19,7 @@
 </body>
 </html>
 
-/* voting.java*/
+/* voting.java(servlet)*/
 package age;
 import java.io.*;
 import javax.servlet.ServletException;
