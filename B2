@@ -1,0 +1,159 @@
+/* # Database: `bankdb`
+CREATE TABLE `bank` (
+`ACC_NO` int(11) NOT NULL,
+  `ACC_NAME` varchar(255) NOT NULL,
+  `ACC_ADDRESS` varchar(255) NOT NULL,
+  `BALANCE` double NOT NULL CHECK (`BALANCE` >= 500)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+*/
+/* Bank.java*/
+package bank;
+import java.sql.*;
+import java.util.Scanner;
+ 
+public class Bank {
+     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+    static final String DB_URL = "jdbc:mysql://localhost:3306/B2";
+    static final String USER = "root";
+    static final String PASS = "";
+ 
+    public static void main(String[] args) {
+        Connection conn = null;
+        Scanner sc = new Scanner(System.in);
+        try {
+            Class.forName(JDBC_DRIVER);
+            System.out.println("Connecting to database...");
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            while (true) {
+                System.out.println("\nMENU");
+                System.out.println("1. Add new Account Holder information");
+                System.out.println("2. Amount Deposit");
+                System.out.println("3. Amount Withdrawal (Maintain minimum balance 500 Rs)");
+                System.out.println("4. Display all information");
+                System.out.println("5. Exit");
+                System.out.print("Enter your choice: ");
+                int choice = sc.nextInt();
+                switch (choice) {
+                    case 1:
+                        addAccount(conn);
+                        break;
+                    case 2:
+                        depositAmount(conn);
+                        break;
+                    case 3:
+                        withdrawAmount(conn);
+                        break;
+                    case 4:
+                        displayAllAccounts(conn);
+                        break;
+                    case 5:
+                        System.out.println("Exiting...");
+                        conn.close();
+                        sc.close();
+                        return;
+                    default:
+                        System.out.println("Invalid choice. Please enter a number between 1 and 5.");
+                }
+            }
+        } catch (SQLException | ClassNotFoundException se) {
+        } finally {
+            try {
+                if (conn != null) conn.close();
+            } catch (SQLException se) {
+            }
+        }
+    }
+    private static void addAccount(Connection conn) throws SQLException {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter Account Holder details:");
+        System.out.print("Account_Number: ");
+        int accNo = sc.nextInt();
+        System.out.print("Account_Name: ");
+        String accName = sc.next();
+        System.out.print("Account_Address: ");
+        String accAddress = sc.next();
+        System.out.print("Balance: ");
+        double balance = sc.nextDouble();
+ 
+        if (balance < 500) {
+            System.out.println("Error: Initial balance must be at least 500. Account not created.");
+        } else {
+            String sql = "INSERT INTO Bank (ACC_NO, ACC_NAME, ACC_ADDRESS, BALANCE) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, accNo);
+                pstmt.setString(2, accName);
+                pstmt.setString(3, accAddress);
+                pstmt.setDouble(4, balance);
+                int rowsInserted = pstmt.executeUpdate();
+                if (rowsInserted > 0) {
+                    System.out.println("Account added successfully!");
+                } else {
+                    System.out.println("Failed to add account.");
+                }
+            }
+        }
+    }
+    private static void depositAmount(Connection conn) throws SQLException {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter Acount_Number: ");
+        int accNo = sc.nextInt();
+        System.out.print("Enter amount to deposit: ");
+        double amount = sc.nextDouble();
+        String sql = "UPDATE Bank SET BALANCE = BALANCE + ? WHERE ACC_NO = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDouble(1, amount);
+            pstmt.setInt(2, accNo);
+            int rowsUpdated = pstmt.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("Amount deposited successfully!");
+            } else {
+                System.out.println("Failed to deposit amount. Account not found.");
+            }
+        }
+    }
+    private static void withdrawAmount(Connection conn) throws SQLException {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter Acount_Number: ");
+        int accNo = sc.nextInt();
+        System.out.print("Enter amount to withdraw: ");
+        double amount = sc.nextDouble();
+        String sqlCheckBalance = "SELECT BALANCE FROM Bank WHERE ACC_NO = ?";
+        String sqlUpdateBalance = "UPDATE Bank SET BALANCE = ? WHERE ACC_NO = ?";
+        try (PreparedStatement pstmtCheck = conn.prepareStatement(sqlCheckBalance)) {
+            pstmtCheck.setInt(1, accNo);
+            ResultSet rs = pstmtCheck.executeQuery();
+            if (rs.next()) {
+                double balance = rs.getDouble("BALANCE");
+                if (balance - amount >= 500) {
+                    try (PreparedStatement pstmtUpdate = conn.prepareStatement(sqlUpdateBalance)) {
+                        pstmtUpdate.setDouble(1, balance - amount);
+                        pstmtUpdate.setInt(2, accNo);
+                        int rowsUpdated = pstmtUpdate.executeUpdate();
+                        if (rowsUpdated > 0) {
+                            System.out.println("Amount withdrawn successfully!");
+                        } else {
+                            System.out.println("Failed to withdraw amount.");
+                        }
+                    }
+                } else {
+                    System.out.println("Insufficient balance! Minimum balance of Rs.500 should be maintained.");
+                }
+            } else {
+                System.out.println("Account not found.");
+            }
+        }
+    }
+    private static void displayAllAccounts(Connection conn) throws SQLException {
+        String sql = "SELECT * FROM Bank";
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                System.out.println("Acount_Number: " + rs.getInt("ACC_NO"));
+                System.out.println("Acount_Name: " + rs.getString("ACC_NAME"));
+                System.out.println("Acount_Address: " + rs.getString("ACC_ADDRESS"));
+                System.out.println("Balance: " + rs.getDouble("BALANCE"));
+                System.out.println("------------------------");
+            }
+        }
+    }
+}
