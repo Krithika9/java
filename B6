@@ -1,4 +1,4 @@
-/*studentinfo.java*/
+/*studentinfo.java(web)*/
 package javabean;
 
 public class studentinfo {
