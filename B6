@@ -1,0 +1,93 @@
+/*studentinfo.java*/
+package javabean;
+
+public class studentinfo {
+   private String name;
+    private int rollno;
+    private String course;
+    private String  sem;
+    public studentinfo(){
+        
+    }
+    public String getName(){
+        return name;
+    }
+    public void setName(String name){
+        this.name=name;
+    }
+    public int getRollNO(){
+        return rollno;
+    }
+    public void setRollNo(int rollno){
+        this.rollno=rollno;
+    }
+    public String getCourse(){
+        return course;
+    }
+    public void setCourse(String course) {
+        this.course=course;
+    }
+    public String getSem(){
+        return sem;
+    }
+    public void setSem(String sem){
+        this.sem=sem;
+    }
+    }
+
+/*student.jsp*/
+<%@page import="javabean.studentinfo"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+    <body>
+        <h1>Enter Student Details</h1>
+        <form action="displaystudent.jsp" method="post">
+             Name:<input type="text" name="name"><br><br></input>
+            Roll no:<input type="number" name="rollno"><br><br></input>
+            Course:<input type="text" name="course"><br><br></input>
+            Semester :<input type="text" name="sem"><br><br></input>
+            <input type="submit" value="Submit"><br><br></input>
+        </form>
+    </body>
+</html>
+
+/* diplaystudent.jsp*/
+
+<%@page import="javabean.studentinfo"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+    <body>
+        <h1>Student Details</h1>
+        <%
+            String name=request.getParameter("name");
+            int rollno=Integer.parseInt(request.getParameter("rollno"));
+            String course=request.getParameter("course");
+            String sem=request.getParameter("sem");
+            studentinfo stu=new studentinfo();
+            stu.setName(name);
+            stu.setRollNo(rollno);
+            stu.setCourse(course);
+            stu.setSem(sem);
+         
+            %>
+            <p> Name:<%=stu.getName()%></p>
+            <p>Roll No:<%=stu.getRollNO()%></p>
+            <p>Course:<%=stu.getCourse()%></p>
+            <p>Semester :<%=stu.getSem()%></p>
+    </body>
+</html>
+
+
+
+
+
