@@ -1,0 +1,104 @@
+/*Sl.java(interface)*/
+package simple_interest;
+import java.rmi.*;
+
+public interface Sl extends Remote  
+{
+    double calculateSimpleInterest(double principal, double rate, double time) throws RemoteException;
+}
+
+/*SlClient.java*/
+package simple_interest;
+import java.rmi.*;
+import java.util.Scanner;
+
+public class SlClient {
+       public static void main(String[] args) {
+        try {
+            Sl simpleInterest = (Sl) Naming.lookup("rmi://localhost/SimpleInterestService");
+            
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Enter principal amount: ");
+            double principal = scanner.nextDouble();
+            System.out.print("Enter rate of interest: ");
+            double rate = scanner.nextDouble();
+            System.out.print("Enter time period (in years): ");
+            double time = scanner.nextDouble();
+            
+            double interest = simpleInterest.calculateSimpleInterest(principal, rate, time);
+            
+            System.out.println("Simple Interest: " + interest);
+        } catch (Exception e) {
+            System.err.println("Simple Interest client exception: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}
+
+/*SlQuery.java*/
+package simple_interest;
+import java.rmi.*;
+import java.util.Scanner;
+
+public class SlClient {
+       public static void main(String[] args) {
+        try {
+            Sl simpleInterest = (Sl) Naming.lookup("rmi://localhost/SimpleInterestService");
+            
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Enter principal amount: ");
+            double principal = scanner.nextDouble();
+            System.out.print("Enter rate of interest: ");
+            double rate = scanner.nextDouble();
+            System.out.print("Enter time period (in years): ");
+            double time = scanner.nextDouble();
+            
+            double interest = simpleInterest.calculateSimpleInterest(principal, rate, time);
+            
+            System.out.println("Simple Interest: " + interest);
+        } catch (Exception e) {
+            System.err.println("Simple Interest client exception: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}
+
+/*Slserver.java*/
+package simple_interest;
+import java.rmi.*;
+import java.rmi.registry.*;
+
+
+public class SlServer {
+        public static void main(String[] args) {
+        try {
+            Sl simpleInterest = new SlQuery();
+            
+            LocateRegistry.createRegistry(1099);
+            
+            Naming.rebind("SimpleInterestService", simpleInterest);
+            
+            System.out.println("Simple Interest server is running...");
+        } catch (Exception e) {
+            System.err.println("Simple Interest service exception: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}
+
+    
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+  
+
